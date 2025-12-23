@@ -1,0 +1,21 @@
+INSERT INTO customers(id,name, age, address) VALUES (1,"Pablo", 22, "Colorado 23");
+INSERT INTO customers(id,name, age, address) VALUES (2,"Luis", 29, "Tamaulipas 22");
+INSERT INTO customers(id,name, age, address) VALUES (3,"Pedro", 30, "Felipe 09");
+INSERT INTO customers(id,name, age, address) VALUES (4,"Cesar", 21, "Chapultepec 44");
+INSERT INTO customers(id,name, age, address) VALUES (5,"Gollo", 50, "Luis Lopez 11");
+INSERT INTO customers(id,name, age, address) VALUES (6,"Romeo", 33, "Enrique Diaz 98");
+INSERT INTO customers(id,name, age, address) VALUES (7,"Pipe", 42, "Lago Azul 66");
+INSERT INTO customers(id,name, age, address) VALUES (8,"Polo", 56, "Guillermo Diaz 71");
+INSERT INTO customers(id,name, age, address) VALUES (9,"Nain", 43, "Mariano Angeles 38");
+
+INSERT INTO products(id,name,price,stock) VALUES (1,"Disco duro STA3 1TB",86.99,5);
+INSERT INTO products(id,name,price,stock) VALUES (2,"Memoria RAM DDR4 8GB",120,6);
+INSERT INTO products(id,name,price,stock) VALUES (3,"Disco SSD 1 TB",150.99,4);
+INSERT INTO products(id,name,price,stock) VALUES (4,"GeForce GTX 1050tu",185,7);
+INSERT INTO products(id,name,price,stock) VALUES (5,"GeForce GTX 1080 Xtreme",755,6);
+INSERT INTO products(id,name,price,stock) VALUES (6,"Monitor 24 LED Full HD",202,1);
+INSERT INTO products(id,name,price,stock) VALUES (7,"Monitor 27 LED Full HD ", 245.99,1);
+INSERT INTO products(id,name,price,stock) VALUES (8,"Portatil Yoga 520",559,2);
+INSERT INTO products(id,name,price,stock) VALUES (9,"Portatil Ideapd 320",444,2);
+INSERT INTO products(id,name,price,stock) VALUES (10,"Impresora HP Deskjet 3720",59.99,3);
+INSERT INTO products(id,name,price,stock) VALUES (11,"Impresora HP Laserjet Pro M26nw",180,3);

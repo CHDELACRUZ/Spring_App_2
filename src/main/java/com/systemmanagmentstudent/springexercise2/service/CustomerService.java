@@ -62,7 +62,7 @@ public class CustomerService {
 
     @Transactional
     public CustomerDTO updateCustomer(Integer id, CustomerDTO customerDTO) {
-        log.info("Updating customer with id: {}", + id);
+        log.info("Updating customer with id: {}", id);
         Customer existingCustomer = customerRepository.findById(id)
                 .orElseThrow(() -> new CustomerNotFoundException("Id not found" + id));
 

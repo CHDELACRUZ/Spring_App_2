@@ -41,14 +41,18 @@ public class CustomerController {
     }
 
     @PutMapping("{id}")
-    public ResponseEntity<CustomerDTO> updateCustomer(@PathVariable Integer id, @Valid @RequestBody CustomerDTO customerDTO) {
+    public ResponseEntity<CustomerDTO> updateCustomer(
+            @PathVariable Integer id,
+            @Valid @RequestBody CustomerDTO customerDTO) {
         CustomerDTO customerUpdated = customerService.updateCustomer(id, customerDTO);
 
         return ResponseEntity.ok(customerUpdated);
     }
 
     @PutMapping("/update/{id}")
-    public ResponseEntity<CustomerDTO> partialUpdateCustomer(@PathVariable Integer id, @Valid @RequestBody CustomerDTO customerDTO) {
+    public ResponseEntity<CustomerDTO> partialUpdateCustomer(
+            @PathVariable Integer id,
+            @Valid @RequestBody CustomerDTO customerDTO) {
         CustomerDTO customerPartialUpdated = customerService.partialUpdateCustomer(id, customerDTO);
 
         return ResponseEntity.ok(customerPartialUpdated);

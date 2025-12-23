@@ -2,18 +2,21 @@ package com.systemmanagmentstudent.springexercise2.service;
 
 import com.systemmanagmentstudent.springexercise2.domain.Product;
 import com.systemmanagmentstudent.springexercise2.dto.ProductDTO;
-import com.systemmanagmentstudent.springexercise2.exceptions.CustomerNotFoundException;
 import com.systemmanagmentstudent.springexercise2.exceptions.DuplicateNameException;
+import com.systemmanagmentstudent.springexercise2.exceptions.DuplicateProductException;
 import com.systemmanagmentstudent.springexercise2.exceptions.ProductNotFoundException;
 import com.systemmanagmentstudent.springexercise2.mapper.ProductMapper;
 import com.systemmanagmentstudent.springexercise2.repository.ProductRepository;
 import lombok.AllArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
 
 @Service
 @AllArgsConstructor
+@Slf4j
 public class ProductService {
 
     private final ProductRepository productRepository;
@@ -51,42 +54,44 @@ public class ProductService {
 
     }
 
+    @Transactional
     public ProductDTO updateProduct(Integer id, ProductDTO productDTO) {
-
+        log.info("Updating product with id: {}", id);
         Product existingProduct = productRepository.findById(id)
-                .orElseThrow(() -> new ProductNotFoundException("Product id not found" + id));
+                .orElseThrow(() -> new ProductNotFoundException("Id not found" + id));
 
-        if(productDTO.getName() != null &&
-            !existingProduct.getName().equals(productDTO.getName())) {
-            throw new DuplicateNameException("Name already exists " + productDTO.getName());
+        if (productDTO.getName() != null &&
+                !existingProduct.getName().equals(productDTO.getName())) {
+            throw new DuplicateProductException("Product name already exists");
         }
         productMapper.updateEntityFromDTO(productDTO, existingProduct);
         Product updatedProduct = productRepository.save(existingProduct);
 
+        log.info("product updated successfully with id: {}", updatedProduct.getId());
         return productMapper.toResponseDTO(updatedProduct);
     }
 
-    public ProductDTO partiallyUpdateProduct(Integer id, ProductDTO productDTO) {
-
+    @Transactional
+    public ProductDTO partialUpdateProduct(Integer id, ProductDTO productDTO) {
+        log.info("Partially updating product with id: {}", productDTO.getId());
         Product existingProduct = productRepository.findById(id)
-                .orElseThrow(() -> new ProductNotFoundException("Product id not found" + id));
+                .orElseThrow(() -> new ProductNotFoundException("Product id not found: " + id));
 
-        if(productDTO.getName() != null &&
+        if (productDTO.getName() != null &&
                 !existingProduct.getName().equals(productDTO.getName())) {
-            throw new DuplicateNameException("Name already exists " + productDTO.getName());
+            throw new DuplicateProductException("Product name already exists");
         }
         productMapper.updateEntityFromDTO(productDTO, existingProduct);
-        Product updatedProduct = productRepository.save(existingProduct);
+        Product partialUpdatedProduct = productRepository.save(existingProduct);
 
-        return productMapper.toResponseDTO(updatedProduct);
+        log.info("Product partially updated successfully with id: {}", partialUpdatedProduct.getId());
+        return productMapper.toResponseDTO(partialUpdatedProduct);
     }
 
     public void deleteProduct(Integer id) {
         if(!productRepository.existsById(id)) {
-            throw new CustomerNotFoundException("Product id not found" + id);
+            throw new ProductNotFoundException("Product id not found" + id);
         }
         productRepository.deleteById(id);
     }
-
-
 }
