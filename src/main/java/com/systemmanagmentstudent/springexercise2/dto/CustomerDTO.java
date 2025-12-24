@@ -15,8 +15,10 @@ public class CustomerDTO {
 
     private Long id;
     private String name;
+    private String username;
     private Integer age;
     private String address;
+    private String password;
     private LocalDateTime createdAt;
     private LocalDateTime updatedAt;
 }

@@ -36,9 +36,9 @@ public class GlobalExceptionHandler {
         return ResponseEntity.status(HttpStatus.NOT_FOUND).body(error);
     }
 
-    @ExceptionHandler(DuplicateNameException.class)
+    @ExceptionHandler(DuplicateUsernameException.class)
     public ResponseEntity<ErrorResponse> handleDuplicateUsernameException(
-            DuplicateNameException ex, HttpServletRequest request) {
+            DuplicateUsernameException ex, HttpServletRequest request) {
 
         log.error("Duplicate username: {}", ex.getMessage());
 

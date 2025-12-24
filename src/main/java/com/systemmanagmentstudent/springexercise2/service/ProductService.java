@@ -2,7 +2,7 @@ package com.systemmanagmentstudent.springexercise2.service;
 
 import com.systemmanagmentstudent.springexercise2.domain.Product;
 import com.systemmanagmentstudent.springexercise2.dto.ProductDTO;
-import com.systemmanagmentstudent.springexercise2.exceptions.DuplicateNameException;
+import com.systemmanagmentstudent.springexercise2.exceptions.DuplicateUsernameException;
 import com.systemmanagmentstudent.springexercise2.exceptions.DuplicateProductException;
 import com.systemmanagmentstudent.springexercise2.exceptions.ProductNotFoundException;
 import com.systemmanagmentstudent.springexercise2.mapper.ProductMapper;
@@ -44,7 +44,7 @@ public class ProductService {
 
     public ProductDTO createProduct(ProductDTO productDTO) {
         if(productRepository.existsByName(productDTO.getName())) {
-            throw new DuplicateNameException("Name already exists: " + productDTO.getName());
+            throw new DuplicateUsernameException("Name already exists: " + productDTO.getName());
         }
 
         Product product = productMapper.toEntity(productDTO);

@@ -1,5 +1,6 @@
 package com.systemmanagmentstudent.springexercise2.domain;
 
+import com.fasterxml.jackson.annotation.JsonProperty;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
@@ -24,16 +25,27 @@ public class Customer {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    @NotBlank(message = "Name can't be null")
+    @NotBlank(message = "Name is required")
     @Size(min = 4, max = 10)
     private String name;
 
-    @NotNull(message = "Age can't be null")
+    @NotBlank(message = "Username is required")
+    @Size(min = 2, max = 50)
+    @Column(nullable = false, length = 50)
+    private String username;
+
+    @NotNull(message = "Age is required")
     @Size(min = 1, max = 100, message = "Age must be between 1 and 100")
     private Integer age;
 
-    @NotBlank(message = "Address can't be null")
+    @NotBlank(message = "Address is required")
     private String address;
+
+    @NotBlank(message = "Password is required")
+    @Size(min = 8, max = 100)
+    @Column(nullable = false)
+    @JsonProperty(access = JsonProperty.Access.WRITE_ONLY)
+    private String password;
 
     @Column(name = "created_at", nullable = false, updatable = false)
     @CreationTimestamp
@@ -42,5 +54,4 @@ public class Customer {
     @Column(name = "updated_At")
     @UpdateTimestamp
     private LocalDateTime updated_At;
-
 }

@@ -15,6 +15,7 @@ public class CustomerMapper {
         return CustomerDTO.builder()
                 .id(customer.getId())
                 .name(customer.getName())
+                .username(customer.getUsername())
                 .age(customer.getAge())
                 .address(customer.getAddress())
                 .build();
@@ -27,6 +28,7 @@ public class CustomerMapper {
         return Customer.builder()
                 .id(customerDTO.getId())
                 .name(customerDTO.getName())
+                .username(customerDTO.getUsername())
                 .age(customerDTO.getAge())
                 .address(customerDTO.getAddress())
                 .build();
@@ -40,6 +42,10 @@ public class CustomerMapper {
 
         if (customerDTO.getName() != null && !customerDTO.getName().isEmpty()) {
             customer.setName(customerDTO.getName());
+        }
+
+        if (customerDTO.getUsername() != null && !customerDTO.getUsername().isEmpty()) {
+            customer.setUsername(customerDTO.getUsername());
         }
 
         if (customerDTO.getAddress() != null && !customerDTO.getAddress().isEmpty()) {

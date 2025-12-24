@@ -28,9 +28,9 @@ public class CustomerController {
         return ResponseEntity.ok(customerService.getCustomerById(id));
     }
 
-    @GetMapping("/customer/name/{name}")
-    public ResponseEntity <List<CustomerDTO>> getCustomerByName(@PathVariable String name) {
-        return ResponseEntity.ok(customerService.getCustomerByName(name));
+    @GetMapping("/username/{username}")
+    public ResponseEntity <CustomerDTO> getCustomerByUsername(@PathVariable String username) {
+        return ResponseEntity.ok(customerService.getCustomerByUsername(username));
     }
 
     @PostMapping

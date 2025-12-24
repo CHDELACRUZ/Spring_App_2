@@ -3,7 +3,7 @@ package com.systemmanagmentstudent.springexercise2.service;
 import com.systemmanagmentstudent.springexercise2.domain.Customer;
 import com.systemmanagmentstudent.springexercise2.dto.CustomerDTO;
 import com.systemmanagmentstudent.springexercise2.exceptions.CustomerNotFoundException;
-import com.systemmanagmentstudent.springexercise2.exceptions.DuplicateNameException;
+import com.systemmanagmentstudent.springexercise2.exceptions.DuplicateUsernameException;
 import com.systemmanagmentstudent.springexercise2.mapper.CustomerMapper;
 import com.systemmanagmentstudent.springexercise2.repository.CustomerRepository;
 import lombok.AllArgsConstructor;
@@ -33,16 +33,20 @@ public class CustomerService {
     public CustomerDTO getCustomerById(Integer id) {
         log.info("Fetching customer with id: {}", id);
         Customer customer = customerRepository.findById(id)
-                .orElseThrow(() -> new CustomerNotFoundException("Customer id not found" + id));
+                .orElseThrow(() -> new CustomerNotFoundException("Customer id not found: " + id));
         return customerMapper.toResponseDTO(customer);
     }
 
-    public List<CustomerDTO> getCustomerByName(String name) {
-        log.info("Searching customer with name: {}", name);
+    public CustomerDTO getCustomerByUsername(String username) {
+        log.info("Searching customer with username: {}", username);
+        if (username == null || username.trim().isEmpty()) {
+            throw new IllegalArgumentException("Username is required");
+        }
 
-        return customerRepository.findCustomerByName(name).stream()
-                .map(customerMapper::toResponseDTO)
-                .toList();
+        Customer customer = customerRepository.findCustomerByUsernameIgnoreCase(username.trim())
+                .orElseThrow(() -> new CustomerNotFoundException("Customer not found with username: " + username));
+
+        return customerMapper.toResponseDTO(customer);
     }
 
     @Transactional
@@ -50,7 +54,7 @@ public class CustomerService {
         log.info("Creating customer with name: {}", customerDTO.getName());
 
         if(customerRepository.existsByName(customerDTO.getName())) {
-            throw new DuplicateNameException("Customer name already exists" + customerDTO);
+            throw new DuplicateUsernameException("Customer name already exists: " + customerDTO);
         }
 
         Customer customer = customerMapper.toEntity(customerDTO);
@@ -62,43 +66,93 @@ public class CustomerService {
 
     @Transactional
     public CustomerDTO updateCustomer(Integer id, CustomerDTO customerDTO) {
-        log.info("Updating customer with id: {}", id);
-        Customer existingCustomer = customerRepository.findById(id)
-                .orElseThrow(() -> new CustomerNotFoundException("Id not found" + id));
+        log.info("Full update for customer with id: {}", id);
 
-        if (customerDTO.getName() != null &&
-                !existingCustomer.getName().equals(customerDTO.getName())) {
-            throw new DuplicateNameException("Name already exists");
+        Customer existingCustomer = customerRepository.findById(id)
+                .orElseThrow(() -> new CustomerNotFoundException("Customer not found with id: " + id));
+
+        //validateUsernameUnique(customerDTO.getUsername(), existingCustomer);
+
+        if (customerDTO.getName() == null || customerDTO.getName().trim().isEmpty()) {
+            throw new IllegalArgumentException("Name is required for full update");
         }
-        customerMapper.updateEntityFromDTO(customerDTO, existingCustomer);
+        if (customerDTO.getUsername() == null || customerDTO.getUsername().trim().isEmpty()) {
+            throw new IllegalArgumentException("Username is required for full update");
+        }
+        if (customerDTO.getAge() == null) {
+            throw new IllegalArgumentException("Age is required for full update");
+        }
+        if (customerDTO.getAddress() == null || customerDTO.getAddress().trim().isEmpty()) {
+            throw new IllegalArgumentException("Address is required for full update");
+        }
+
+        existingCustomer.setName(customerDTO.getName().trim());
+        existingCustomer.setUsername(customerDTO.getUsername().trim());
+        existingCustomer.setAge(customerDTO.getAge());
+        existingCustomer.setAddress(customerDTO.getAddress().trim());
+
+        if (customerDTO.getPassword() != null && !customerDTO.getPassword().isEmpty()) {
+            existingCustomer.setPassword(customerDTO.getPassword());
+        }
+
         Customer updatedCustomer = customerRepository.save(existingCustomer);
 
-        log.info("Customer updated successfully with id: {}", updatedCustomer.getId());
+        log.info("Customer fully updated successfully with id: {}", updatedCustomer.getId());
         return customerMapper.toResponseDTO(updatedCustomer);
     }
 
     @Transactional
     public CustomerDTO partialUpdateCustomer(Integer id, CustomerDTO customerDTO) {
-        log.info("Partially updating customer with id: {}", customerDTO.getId());
+        log.info("Partial update for customer with id: {}", id);
+
         Customer existingCustomer = customerRepository.findById(id)
-                .orElseThrow(() -> new CustomerNotFoundException("Customer id not found: " + id));
+                .orElseThrow(() -> new CustomerNotFoundException("Customer not found with id: " + id));
 
-        if (customerDTO.getName() != null &&
-            !existingCustomer.getName().equals(customerDTO.getName())) {
-            throw new DuplicateNameException("Name already exists");
+        if (customerDTO.getName() != null && !customerDTO.getName().trim().isEmpty()) {
+            existingCustomer.setName(customerDTO.getName().trim());
         }
-        customerMapper.updateEntityFromDTO(customerDTO, existingCustomer);
-        Customer partialUpdatedCustomer = customerRepository.save(existingCustomer);
 
-        log.info("Customer partially updated successfully with id: {}", partialUpdatedCustomer.getId());
-        return customerMapper.toResponseDTO(partialUpdatedCustomer);
+        if (customerDTO.getUsername() != null && !customerDTO.getUsername().trim().isEmpty()) {
+            String newUsername = customerDTO.getUsername().trim();
+
+            if (!existingCustomer.getUsername().equals(newUsername) &&
+                    customerRepository.existsByUsername(newUsername)) {
+                throw new DuplicateUsernameException("Username already exists: " + newUsername);
+            }
+            existingCustomer.setUsername(customerDTO.getUsername().trim());
+        }
+
+        if (customerDTO.getAge() != null) {
+            existingCustomer.setAge(customerDTO.getAge());
+        }
+
+        if (customerDTO.getAddress() != null && !customerDTO.getAddress().trim().isEmpty()) {
+            existingCustomer.setAddress(customerDTO.getAddress());
+        }
+
+        if (customerDTO.getPassword() != null && !customerDTO.getPassword().isEmpty()) {
+            existingCustomer.setPassword(customerDTO.getPassword());
+        }
+
+        Customer updatedCustomer = customerRepository.save(existingCustomer);
+
+        log.info("Customer partially updated successfully with id: {}", updatedCustomer.getId());
+        return customerMapper.toResponseDTO(updatedCustomer);
     }
+
+    /* private void validateUsernameUnique(String newUsername, Customer existingCustomer) {
+        if (newUsername != null &&
+                !existingCustomer.getUsername().equals(newUsername) &&
+                customerRepository.existsByUsername(newUsername)) {
+            throw new DuplicateUsernameException("Username already exists: " + newUsername);
+        }
+    } */
 
     @Transactional
     public void deleteCustomer(Integer id) {
         log.info("Deleting customer with id: {}", id);
         if (!customerRepository.existsById(id)) {
-            throw new CustomerNotFoundException("Customer id not found" + id);
+            throw new CustomerNotFoundException("Customer id not found: " + id);
         }
 
         customerRepository.deleteById(id);
